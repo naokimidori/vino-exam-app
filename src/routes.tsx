@@ -1,8 +1,75 @@
 import Login from "./pages/Login";
+import PersonInfo from "./pages/PersonInfo";
+import ExamSelect from "./pages/ExamSelect";
+import Exam from "./pages/Exam";
+import ExamHistory from "./pages/ExamHistory";
+import ReadExam from "./pages/ReadExam";
+import CorrectExamList from "./pages/CorrectExamList";
+import CorrectExam from "./pages/CorrectExam";
+import StudentManage from "./pages/StudentManage";
+import SubjectManage from "./pages/SubjectManage";
+import SubjectAdd from "./pages/SubjectAdd";
+import AdminManage from "./pages/AdminManage";
 
 export const routesConfig = [
   {
     path: '/login',
-    component: <Login />
-  }
-]
+    component: <Login />,
+    showMenu: false,
+  },
+  {
+    path: '/person_info',
+    component: <PersonInfo />,
+    showMenu: false,
+  },
+  {
+    path: '/exam_select',
+    component: <ExamSelect />,
+    showMenu: false,
+  },
+  {
+    path: '/exam/:exam_id',
+    component: <Exam />,
+    showMenu: true,
+  },
+  {
+    path: '/exam_history',
+    component: <ExamHistory />,
+    showMenu: true,
+  },
+  {
+    path: '/read_exam',
+    component: <ReadExam />,
+    showMenu: false,
+  },
+  {
+    path: '/corret_exam_list',
+    component: <CorrectExamList />,
+    showMenu: false,
+  },
+  {
+    path: '/corret_exam',
+    component: <CorrectExam />,
+    showMenu: true,
+  },
+  {
+    path: '/student_manage',
+    component: <StudentManage />,
+    showMenu: false,
+  },
+  {
+    path: '/subject_manage',
+    component: <SubjectManage />,
+    showMenu: false,
+  },
+  {
+    path: '/subject_add',
+    component: <SubjectAdd />,
+    showMenu: false,
+  },
+  {
+    path: '/admin_manage',
+    component: <AdminManage />,
+    showMenu: true,
+  },
+];
