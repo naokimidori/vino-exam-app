@@ -25,7 +25,7 @@ export const routesConfig = [
   {
     path: '/exam_select',
     component: <ExamSelect />,
-    showMenu: false,
+    showMenu: true,
   },
   {
     path: '/exam/:exam_id',
@@ -40,7 +40,7 @@ export const routesConfig = [
   {
     path: '/read_exam',
     component: <ReadExam />,
-    showMenu: false,
+    showMenu: true,
   },
   {
     path: '/corret_exam_list',
@@ -55,17 +55,17 @@ export const routesConfig = [
   {
     path: '/student_manage',
     component: <StudentManage />,
-    showMenu: false,
+    showMenu: true,
   },
   {
     path: '/subject_manage',
     component: <SubjectManage />,
-    showMenu: false,
+    showMenu: true,
   },
   {
     path: '/subject_add',
     component: <SubjectAdd />,
-    showMenu: false,
+    showMenu: true,
   },
   {
     path: '/admin_manage',

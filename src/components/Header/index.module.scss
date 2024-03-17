@@ -1,0 +1,33 @@
+.pageHeader {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-sizing: border-box;
+  background-color: #fff;
+
+  .logo {
+    width: 238px;
+    height: 40px;
+  }
+  .rightWrapper {
+    img {
+      width: 44px;
+      height: 44px;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+
+      .userName {
+        margin-left: 8px;
+        font-size: 14px;
+        color: #5f6367;
+        letter-spacing: 0;
+        line-height: 19.6px;
+      }
+    }
+  }
+}

@@ -1,5 +1,11 @@
+html,body {
+  background-color: #f2f4f7;
+}
+
 .layout {
-  .layout-header {
-    color: red;
+  .layout-content  {
+    width: 1200px;
+    margin: 20px auto;
+    border-radius: 8px;
   }
 }
