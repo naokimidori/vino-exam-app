@@ -1,0 +1,10 @@
+.loginPage {
+  color: red;
+
+  :global {
+    .ant-pro-form-login-page-title {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+  }
+}
