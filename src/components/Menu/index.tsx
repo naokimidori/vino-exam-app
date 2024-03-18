@@ -30,7 +30,7 @@ const Menu: React.FC = () => {
   }, [])
 
   return (
-    <AntdMenu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+    <AntdMenu className='rounded' onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
   )
 }
 
