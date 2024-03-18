@@ -1,8 +1,7 @@
 import React from 'react';
-import { Avatar, Badge, Space } from 'antd';
+import { Space } from 'antd';
 import styles from './index.module.scss';
 import { LOGO } from '@/common/constant';
-import { UserOutlined, BellOutlined } from '@ant-design/icons';
 
 const Header: React.FC = () => {
   return (
