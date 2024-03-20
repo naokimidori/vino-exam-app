@@ -11,9 +11,24 @@ import {
 } from '@ant-design/pro-components';
 import { message, theme } from 'antd';
 import styles from './index.module.scss';
+import http from '@/utils/http'
 
 const Page = () => {
   const { token } = theme.useToken();
+  const  onLogin = async (values: any) => {
+    const result = await http.post('/api/user/login', {
+      phone: values.phone,
+      code: values.ackCode,
+    });
+    
+    const { code, data, message: msg } = result.data;
+    if (code !== 0) {
+      message.error(msg);
+      return;
+    }
+
+    // TODO: 登录成功后的处理
+  }
   return (
     <div
       className={styles.loginPage}
@@ -23,6 +38,7 @@ const Page = () => {
       }}
     >
       <LoginFormPage
+        onFinish={onLogin}
         backgroundVideoUrl="https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/jXRBRK_VAwoAAAAAAAAAAAAAK4eUAQBr"
         title="考试评测系统"
         containerStyle={{
@@ -43,7 +59,7 @@ const Page = () => {
                 />
               ),
             }}
-            name="mobile"
+            name="phone"
             placeholder={'手机号'}
             rules={[
               {
@@ -78,7 +94,7 @@ const Page = () => {
               }
               return '获取验证码';
             }}
-            name="captcha"
+            name="ackCode"
             rules={[
               {
                 required: true,
