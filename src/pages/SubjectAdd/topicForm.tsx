@@ -5,6 +5,8 @@ import CustomUpload from './upload';
 import { UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload';
 import { uploadFileByCos } from '@/utils/uploadUtil';
 import http from '@/utils/http';
+import { useSelector } from 'react-redux';
+import { selectActiveLesson } from '@/store/slice/subject';
 
 type FieldType = {
   title?: string;
@@ -15,6 +17,7 @@ type FieldType = {
 const TopicForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const currentLesson = useSelector(selectActiveLesson);  
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -30,6 +33,12 @@ const TopicForm: React.FC = () => {
   }
 
   const onFinish: FormProps<FieldType>['onFinish'] = async values => {
+    
+    if (!currentLesson?.value) {
+      message.error('请先选择课程');
+      return
+    }
+
     setLoading(true);
     if (fileList.length) {
       // 需要上传的图片文件（如果没有则不用处理）
@@ -42,7 +51,12 @@ const TopicForm: React.FC = () => {
       values.img = [];
     }
 
-    const result = await http.post('/api/topic', values);
+    const params = {
+      ...values,
+      twoId: currentLesson?.value,
+    }
+
+    const result = await http.post('/api/topic', params);
     setLoading(false);
     const { data } = result || {};
     if (data?.code !== 0) {

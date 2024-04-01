@@ -1,10 +1,12 @@
 import { AppDispatch } from '@/store';
 import {
-  LessonType,
+  LessonTreeType,
   getSubjectTree,
-  selectActiveTwo,
+  getTopicList,
+  selectActiveLesson,
   selectSubjectTree,
-  setActiveTwo,
+  setActiveLesson,
+  setActiveTopic,
 } from '@/store/slice/subject';
 import React, { useEffect, ReactNode, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,10 +16,10 @@ import TopicList from './topicList';
 import TopicForm from './topicForm';
 
 // 禁用含有children字段的项
-const disableChildrenItem = (items: LessonType[]) => {
+const disableChildrenItem = (items: LessonTreeType[]) => {
   const _items = JSON.parse(JSON.stringify(items));
-  return _items.map((item: LessonType) => {
-    if (item.children?.length > 0) {
+  return _items.map((item: LessonTreeType) => {
+    if (item.children?.length && item.children?.length > 0) {
       // @ts-ignore
       item.disabled = true;
       item.children = disableChildrenItem(item.children);
@@ -29,30 +31,32 @@ const disableChildrenItem = (items: LessonType[]) => {
 function SubjectAdd() {
   const dispatch: AppDispatch = useDispatch();
   // 学科列表
-  const lessonList = useSelector(selectSubjectTree);
+  const lessonTreeList = useSelector(selectSubjectTree);
   // 学科列表memo、使父级不能选择
-  const lessonListMemo = useMemo(() => {
-    console.log('lessonListMemo渲染～');
-    return lessonList?.length ? disableChildrenItem(lessonList) : [];
-  }, [lessonList]);
+  const lessonTreeListMemo = useMemo(() => {
+    console.log('lessonTreeListMemo渲染～');
+    return lessonTreeList?.length ? disableChildrenItem(lessonTreeList) : [];
+  }, [lessonTreeList]);
   // 当前学科
-  const currentLesson = useSelector(selectActiveTwo);
+  const currentLesson = useSelector(selectActiveLesson);
 
+  // 获取课程树
   useEffect(() => {
-    dispatch(getSubjectTree()).then((res: any) => {
-      const initOne = get(res, 'payload[0].children[0]', {});
-      dispatch(
-        setActiveTwo({
-          title: initOne.title,
-          value: initOne.value,
-        })
-      );
-    });
+    dispatch(getSubjectTree());
   }, []);
 
-  const onChange = (newValue: string, label: ReactNode[]) => {
+  // 获取题目列表
+  useEffect(() => {
+    if (!currentLesson?.value) return;
+    dispatch(getTopicList(currentLesson.value));
+  }, [currentLesson?.value]);
+
+  const onLessonChange = (newValue: string, label: ReactNode[]) => {
+    // 清空右侧form区
+    dispatch(setActiveTopic(null));
+    // 设置当前课程
     dispatch(
-      setActiveTwo({
+      setActiveLesson({
         title: label[0],
         value: newValue,
       })
@@ -64,7 +68,7 @@ function SubjectAdd() {
       <div className="h-18 flex items-center pb-4 border-b-2 border-gray-100">
         <div className="w-1 h-5 bg-blue-600"></div>
         <div className="mx-3 min-w-[100px]">
-          {currentLesson.title || '暂无'}
+          {currentLesson?.title || '暂无'}
         </div>
         <div className="w-60">
           <TreeSelect
@@ -75,8 +79,8 @@ function SubjectAdd() {
             placeholder="请选择试卷"
             allowClear
             treeDefaultExpandAll
-            onChange={onChange}
-            treeData={lessonListMemo}
+            onChange={onLessonChange}
+            treeData={lessonTreeListMemo}
           />
         </div>
         <div className="ml-3">

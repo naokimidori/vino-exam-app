@@ -20,6 +20,9 @@ export type ResData<T = any> = {
   data: T;
 };
 
+// 本地开发调试
+instance.defaults.headers.common['Cache-Control'] = 'no-cache';
+
 instance.interceptors.response.use((resp: AxiosResponse) => {
   return resp;
 }, (error) => {

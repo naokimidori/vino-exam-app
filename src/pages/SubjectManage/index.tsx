@@ -4,18 +4,10 @@ import type { TableProps } from 'antd';
 import SubjectFormModal from './SubjectFormModal';
 import { useDispatch, useSelector } from 'react-redux';
 import http from '@/utils/http';
-import { getLessonList, lessonList } from '@/store/slice/subject';
+import { LessonType, getLessonList, lessonList } from '@/store/slice/subject';
 import { AppDispatch } from '@/store';
 import dayjs from 'dayjs';
 import { TIME_FORMAT } from '@/common/constant';
-
-export interface LessonDataType {
-  _id: string;
-  created: Date;
-  oneId: string;
-  oneName: string;
-  twoName: string;
-}
 
 function SubjectManage() {
   const dispatch: AppDispatch = useDispatch();
@@ -32,7 +24,7 @@ function SubjectManage() {
     }
   }
 
-  const columns: TableProps<LessonDataType>['columns'] = [
+  const columns: TableProps<LessonType>['columns'] = [
     {
       title: '序号',
       dataIndex: '_id',

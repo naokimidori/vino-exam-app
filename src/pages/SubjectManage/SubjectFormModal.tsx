@@ -1,12 +1,12 @@
 import { Form, Input, Modal, Select, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import http from '@/utils/http';
-import { LessonDataType } from './index';
+import { LessonType } from '@/store/slice/subject';
 
 interface SubjectFormModalProps {
   children: React.ReactNode;
   addSuccessHandler?: () => void;
-  modifyData?: LessonDataType;
+  modifyData?: LessonType;
 }
 
 type Course = {
