@@ -1,6 +1,10 @@
-import { Button, Form, type FormProps, Input, Upload } from 'antd';
-import React from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, message } from 'antd';
+import type { FormProps } from 'antd';
+import React, { useState } from 'react';
+import CustomUpload from './upload';
+import { UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload';
+import { uploadFileByCos } from '@/utils/uploadUtil';
+import http from '@/utils/http';
 
 type FieldType = {
   title?: string;
@@ -10,9 +14,44 @@ type FieldType = {
 
 const TopicForm: React.FC = () => {
   const [form] = Form.useForm();
-  
-  const onFinish: FormProps<FieldType>['onFinish'] = values => {
-    console.log('Success:', values);
+  const [loading, setLoading] = useState(false);
+
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const handleImgChange: UploadProps['onChange'] = async (
+    fileInfo: UploadChangeParam
+  ) => {
+    setFileList(fileInfo.fileList.map(item => ({ ...item, status: 'done' })));
+  };
+
+  const resetForm = () => {
+    form.resetFields();
+    setFileList([]);
+  }
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async values => {
+    setLoading(true);
+    if (fileList.length) {
+      // 需要上传的图片文件（如果没有则不用处理）
+      const needUploadImgs = fileList.filter(file => !file.url);
+      if (needUploadImgs.length) {
+        const imgURLs = (await uploadFileByCos(fileList)) as string[];
+        values.img = imgURLs;
+      }
+    } else {
+      values.img = [];
+    }
+
+    const result = await http.post('/api/topic', values);
+    setLoading(false);
+    const { data } = result || {};
+    if (data?.code !== 0) {
+      message.error(data?.message || '系统异常，请稍后再试～');
+      return
+    }
+
+    message.success('题目保存成功');
+    resetForm();
   };
 
   return (
@@ -38,27 +77,26 @@ const TopicForm: React.FC = () => {
           <Input />
         </Form.Item>
 
-        <Form.Item<FieldType>
-          label="描述"
-          name="desc"
-        >
+        <Form.Item<FieldType> label="描述" name="desc">
           <Input.TextArea />
         </Form.Item>
 
-        <Form.Item<FieldType>
-          label="图片"
-          name="img"
-        >
-          <Upload action="/upload.do" listType="picture-card">
-            <button style={{ border: 0, background: 'none' }} type="button">
-              <PlusOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </button>
-          </Upload>
+        <Form.Item<FieldType> label="图片" name="img">
+          <CustomUpload
+            fileList={fileList}
+            uploadProps={{
+              onChange: handleImgChange,
+            }}
+          />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            loading={loading}
+            disabled={loading}
+            type="primary"
+            htmlType="submit"
+          >
             保存题目
           </Button>
         </Form.Item>
