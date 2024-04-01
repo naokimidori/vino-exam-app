@@ -1,12 +1,19 @@
-import { Button, Form, Input, message } from 'antd';
+import { Alert, Button, Form, Input, Tag, message } from 'antd';
 import type { FormProps } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CustomUpload from './upload';
 import { UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload';
 import { uploadFileByCos } from '@/utils/uploadUtil';
 import http from '@/utils/http';
-import { useSelector } from 'react-redux';
-import { selectActiveLesson } from '@/store/slice/subject';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  getTopicList,
+  selectActiveLesson,
+  selectActiveTopic,
+  setActiveLesson,
+  setActiveTopic,
+} from '@/store/slice/subject';
+import { AppDispatch } from '@/store';
 
 type FieldType = {
   title?: string;
@@ -15,9 +22,11 @@ type FieldType = {
 };
 
 const TopicForm: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const currentLesson = useSelector(selectActiveLesson);  
+  const currentLesson = useSelector(selectActiveLesson);
+  const currentTopic = useSelector(selectActiveTopic);
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -30,13 +39,47 @@ const TopicForm: React.FC = () => {
   const resetForm = () => {
     form.resetFields();
     setFileList([]);
-  }
+  };
+
+  useEffect(() => {
+    if (!currentTopic) {
+      resetForm();
+    } else {
+      form.setFieldsValue({
+        title: currentTopic.title,
+        desc: currentTopic.desc,
+        img: currentTopic.img,
+      });
+      if (currentTopic.img?.length) {
+        setFileList(
+          currentTopic.img?.map(url => {
+            const fileName = url.split('/').at(-1)!;
+            return {
+              uid: fileName,
+              name: fileName,
+              status: 'done',
+              url: '//' + url,
+            };
+          })
+        );
+      } else {
+        setFileList([]);
+      }
+    }
+  }, [currentTopic?._id]);
+
+  // 组件卸载时把当前选择的数据删除
+  useEffect(() => {
+    return () => {
+      dispatch(setActiveTopic(null));
+      dispatch(setActiveLesson(null));
+    };
+  }, []);
 
   const onFinish: FormProps<FieldType>['onFinish'] = async values => {
-    
     if (!currentLesson?.value) {
       message.error('请先选择课程');
-      return
+      return;
     }
 
     setLoading(true);
@@ -50,29 +93,64 @@ const TopicForm: React.FC = () => {
     } else {
       values.img = [];
     }
+    try {
+      let result;
+      // 更新
+      if (currentTopic) {
+        const params = {
+          title: values.title,
+          desc: values.desc,
+          img: values.img,
+        };
+        result = await http.patch(`/api/topic/${currentTopic._id}`, params);
+      } else {
+        // 新增
+        const params = {
+          ...values,
+          twoId: currentLesson?.value,
+        };
+        result = await http.post('/api/topic', params);
+      }
 
-    const params = {
-      ...values,
-      twoId: currentLesson?.value,
+      setLoading(false);
+      const { data } = result || {};
+      if (data?.code !== 0) {
+        message.error(data?.message || '系统异常，请稍后再试～');
+        return;
+      }
+
+      message.success('题目保存成功');
+      resetForm();
+      // 刷新课程题目列表
+      dispatch(getTopicList(currentLesson.value));
+    } catch (error) {
+      setLoading(false);
     }
+  };
 
-    const result = await http.post('/api/topic', params);
-    setLoading(false);
-    const { data } = result || {};
-    if (data?.code !== 0) {
-      message.error(data?.message || '系统异常，请稍后再试～');
-      return
-    }
-
-    message.success('题目保存成功');
+  const handleClose = () => {
+    dispatch(setActiveTopic(null));
     resetForm();
   };
 
   return (
     <div className="rounded-lg h-full bg-slate-100 p-4">
+      {!currentLesson && (
+        <Alert
+          className="mb-4"
+          description="新建题目前请先选择课程，否则无法保存题目！"
+          type="warning"
+          showIcon
+        />
+      )}
       <div className="flex items-center mb-8">
         <div className="w-1 h-5 bg-blue-600"></div>
         <span className="mx-3">题目详情</span>
+        {currentTopic ? (
+          <Tag color="volcano">修改</Tag>
+        ) : (
+          <Tag color="blue">新增</Tag>
+        )}
       </div>
 
       <Form
@@ -113,6 +191,11 @@ const TopicForm: React.FC = () => {
           >
             保存题目
           </Button>
+          {currentTopic && (
+            <Button type="default" className="ml-4" onClick={handleClose}>
+              关闭
+            </Button>
+          )}
         </Form.Item>
       </Form>
     </div>

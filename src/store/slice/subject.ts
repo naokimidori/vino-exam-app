@@ -33,6 +33,8 @@ export type TopicType = {
 
 // state类型
 type SubjectState = {
+  /** 左侧列表loading */
+  listSpinning: boolean;
   /** 课程树结构 */
   subjectTree: LessonTreeType[];
   /** 课程列表 -- 课程管理页用 */
@@ -48,6 +50,7 @@ type SubjectState = {
 };
 
 const initialState: SubjectState = {
+  listSpinning: false,
   subjectTree: [],
   lessonList: [],
   topicList: [],
@@ -109,14 +112,20 @@ export const subjectSlice = createSlice({
       .addCase(getLessonList.fulfilled, (state, res) => {
         state.lessonList = res.payload;
       })
+      .addCase(getTopicList.pending, state => {
+        state.listSpinning = true;
+      })
       // 获取题目列表fulfilled
       .addCase(getTopicList.fulfilled, (state, res) => {
         state.topicList = res.payload;
+        state.listSpinning = false;
       });
   },
 });
 
-
+// 获取左侧列表loading状态
+export const selectListLoading = (state: RootState) =>
+  state.subject.listSpinning;
 // 获取课程树状数据
 export const selectSubjectTree = (state: RootState) =>
   state.subject.subjectTree;
@@ -128,9 +137,11 @@ export const lessonList = (state: RootState) => state.subject.lessonList;
 // 获取题目列表
 export const selectTopicList = (state: RootState) => state.subject.topicList;
 // 获取当前选择的题目
-export const selectActiveTopic = (state: RootState) => state.subject.activeTopic;
+export const selectActiveTopic = (state: RootState) =>
+  state.subject.activeTopic;
 
 // 导出action
-export const { setActiveLesson, setActiveTopic, setExamSelectData } = subjectSlice.actions;
+export const { setActiveLesson, setActiveTopic, setExamSelectData } =
+  subjectSlice.actions;
 
 export default subjectSlice.reducer;

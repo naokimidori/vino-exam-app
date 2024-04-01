@@ -68,7 +68,7 @@ function SubjectAdd() {
       <div className="h-18 flex items-center pb-4 border-b-2 border-gray-100">
         <div className="w-1 h-5 bg-blue-600"></div>
         <div className="mx-3 min-w-[100px]">
-          {currentLesson?.title || '暂无'}
+          {currentLesson?.title || '请选择课程'}
         </div>
         <div className="w-60">
           <TreeSelect
@@ -84,7 +84,9 @@ function SubjectAdd() {
           />
         </div>
         <div className="ml-3">
-          <Button type="primary">新增题目</Button>
+          <Button type="primary" onClick={() => dispatch(setActiveTopic(null))}>
+            新增题目
+          </Button>
         </div>
       </div>
 
