@@ -138,7 +138,7 @@ const TopicForm: React.FC = () => {
       {!currentLesson && (
         <Alert
           className="mb-4"
-          description="新建题目前请先选择课程，否则无法保存题目！"
+          description="请先选择一门课程，否则无法保存题目！"
           type="warning"
           showIcon
         />
